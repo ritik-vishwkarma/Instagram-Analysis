@@ -31,6 +31,8 @@ if (uniqueIdentifier.length > 35) {
     }
 }
 
-export const CURRENT_DATE_TIME = uniqueIdentifier;
+const CURRENT_DATE_TIME = uniqueIdentifier;
 
-console.log(`Current unique identifier is: ${CURRENT_DATE_TIME}`);
+export function generateCollectionName() {
+    return `collection_${CURRENT_DATE_TIME}`;
+}

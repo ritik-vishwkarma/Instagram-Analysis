@@ -3,9 +3,8 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApifyClient } from 'apify-client';
 import { insertData } from "../models/apify.model.js";
-// import connectDB from "../db/index.js";
-import { CURRENT_DATE_TIME } from "../constants.js";
-// import { storeCollectionName } from "../middleware/store.collectionName.js";
+import { generateCollectionName } from "../constants.js";
+
 
 const apifyClient = new ApifyClient({
     token: process.env.APIFY_API_TOKEN,
@@ -61,8 +60,8 @@ const runActor = asyncHandler(async (req, res) => {
         // await connectDB();
 
         // Create a collection name based on the current date-time string
-        const currentDateTime = CURRENT_DATE_TIME;
-        const collectionName = `collection_${currentDateTime}`;
+        const collectionName = generateCollectionName();
+        console.log(`Generated collection name: ${collectionName}`);
 
         // Insert the data into the database
         await insertData(req.db, collectionName, filteredData);
