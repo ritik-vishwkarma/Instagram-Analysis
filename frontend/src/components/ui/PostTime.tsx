@@ -111,7 +111,8 @@ const PostingTimeAnalyzer: React.FC<PostingTimeAnalyzerProps> = () => {
     if (!showResults) {
         return (
             <div className="flex justify-center">
-                <div className="w-full bg-gray-950 rounded-lg border border-gray-800 p-8 shadow-lg flex flex-col items-center">
+                {/* Removed the background container */}
+                <div className="flex flex-col items-center">
                     <button
                         onClick={analyzePostingTime}
                         disabled={loading}

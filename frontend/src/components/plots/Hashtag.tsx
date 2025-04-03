@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 import { fetchHashtagData, HashtagCount } from "@/db";
 
-const HashtagWordCloud = () => {
+const HashtagCloud = () => {
   const [hashtagData, setHashtagData] = useState<HashtagCount[]>([]);
   const [hovered, setHovered] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [view, setView] = useState<'grid' | 'cloud'>('grid');
 
   useEffect(() => {
     const loadHashtagData = async () => {
@@ -40,30 +39,6 @@ const HashtagWordCloud = () => {
           <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 via-purple-500/20 to-pink-500/20 rounded-lg backdrop-blur-sm border border-white/10 shadow-lg transform rotate-1 z-0"></div>
         </div>
       </div>
-      
-      {/* Toggle buttons in separate row */}
-      <div className="flex justify-center mb-5">
-        <div className="rounded-lg p-1 flex space-x-2">
-          <button
-            onClick={() => setView('grid')}
-            className={`px-4 py-1.5 rounded text-sm font-medium transition-all ${view === 'grid'
-              ? 'bg-blue-600 text-white shadow-sm' 
-              : 'text-blue-200/70 hover:bg-gray-700/50'
-            }`}
-          >
-            Heat Map
-          </button>
-          <button
-            onClick={() => setView('cloud')}
-            className={`px-4 py-1.5 rounded text-sm font-medium transition-all ${view === 'cloud'
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'text-blue-200/70 hover:bg-gray-700/50'
-            }`}
-          >
-            Tag Cloud
-          </button>
-        </div>
-      </div>
 
       {/* Loading state */}
       {loading && (
@@ -93,129 +68,49 @@ const HashtagWordCloud = () => {
           <div className="bg-gray-950 backdrop-blur-md rounded-lg border border-white/10 shadow-md p-5 pb-7">
             {/* Non-scrollable fixed content container with increased height */}
             <div className="h-[380px]"> 
-              {/* Heat Map Grid View - exact 2 columns with 5 rows */}
-              {view === 'grid' && (
-                <div className="h-full">
-                  <div className="grid grid-cols-2 gap-4">
-                    {hashtagData.map((tag, index) => {
-                      // Calculate intensity based on usage count
-                      const maxCount = Math.max(...hashtagData.map(t => t.count));
-                      const minCount = Math.min(...hashtagData.map(t => t.count));
-                      const range = maxCount - minCount || 1;
-                      const intensity = (tag.count - minCount) / range;
-                      
-                      // Generate colors based on intensity using inline styles
-                      const opacity = Math.max(0.4, Math.min(0.9, intensity));
-                      
-                      // Custom gradient background based on intensity
-                      let gradientStyle;
-                      if (intensity < 0.3) {
-                        gradientStyle = {
-                          background: `linear-gradient(135deg, rgba(30, 58, 138, ${opacity}) 0%, rgba(67, 56, 202, ${opacity}) 100%)`
-                        };
-                      } else if (intensity < 0.6) {
-                        gradientStyle = {
-                          background: `linear-gradient(135deg, rgba(79, 70, 229, ${opacity}) 0%, rgba(124, 58, 237, ${opacity}) 100%)`
-                        };
-                      } else if (intensity < 0.9) {
-                        gradientStyle = {
-                          background: `linear-gradient(135deg, rgba(139, 92, 246, ${opacity}) 0%, rgba(168, 85, 247, ${opacity}) 100%)`
-                        };
-                      } else {
-                        gradientStyle = {
-                          background: `linear-gradient(135deg, rgba(192, 38, 211, ${opacity}) 0%, rgba(236, 72, 153, ${opacity}) 100%)`
-                        };
-                      }
+              {/* Tag Cloud View */}
+              <div className="h-full flex items-center justify-center">
+                <div className="flex flex-wrap justify-center items-center gap-4 p-5 max-w-xl">
+                  {hashtagData.map((tag, index) => {
+                    // Calculate size based on count
+                    const maxCount = Math.max(...hashtagData.map(t => t.count));
+                    const minCount = Math.min(...hashtagData.map(t => t.count));
+                    const range = maxCount - minCount || 1;
+                    const sizeFactor = 0.8 + ((tag.count - minCount) / range);
+                    // Slightly larger font sizes for the expanded container
+                    const fontSize = `${Math.max(0.9, Math.min(2.0, sizeFactor * 1.3))}rem`;
 
-                      return (
-                        <div
-                          key={tag.hashtag}
-                          className="relative rounded overflow-hidden transition-all duration-300 group hover:shadow-md"
-                          onMouseEnter={() => setHovered(tag.hashtag)}
-                          onMouseLeave={() => setHovered(null)}
-                        >
-                          {/* Use inline style for gradient */}
-                          <div className="absolute inset-0" style={gradientStyle}></div>
+                    // Calculate color based on popularity rank
+                    let textColor;
+                    if (index === 0) textColor = 'text-yellow-400';
+                    else if (index === 1) textColor = 'text-blue-300';
+                    else if (index === 2) textColor = 'text-pink-400';
+                    else if (index < 6) textColor = 'text-purple-300';
+                    else textColor = 'text-blue-200/70';
 
-                          <div className="relative p-3 flex items-center">
-                            {/* Rank badge for top 3 */}
-                            {index < 3 && (
-                              <div className={`w-5 h-5 mr-2 rounded-full flex items-center justify-center text-xs font-bold
-                                ${index === 0 ? 'bg-yellow-400 text-gray-900' :
-                                  index === 1 ? 'bg-gray-300 text-gray-900' :
-                                    'bg-amber-700 text-white'}`}
-                              >
-                                {index + 1}
-                              </div>
-                            )}
-                            
-                            <div className="flex-1">
-                              <div className="font-medium text-white">{tag.hashtag}</div>
-                              <div className="text-xs text-white/70">{tag.count} posts</div>
-                            </div>
-                            
-                            {/* Progress bar */}
-                            <div className="w-20 ml-2">
-                              <div className="h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                                <div
-                                  className="h-1.5 bg-white/70 rounded-full"
-                                  style={{ width: `${(tag.count / maxCount) * 100}%` }}
-                                ></div>
-                              </div>
-                            </div>
+                    const fontWeight = index < 3 ? 'font-bold' : 'font-medium';
+
+                    return (
+                      <div
+                        key={tag.hashtag}
+                        className={`relative transition-all duration-300 hover:scale-110 cursor-pointer ${textColor} ${fontWeight} px-2 hover:drop-shadow-glow`}
+                        style={{ fontSize }}
+                        onMouseEnter={() => setHovered(tag.hashtag)}
+                        onMouseLeave={() => setHovered(null)}
+                      >
+                        {tag.hashtag}
+
+                        {/* Popup on hover */}
+                        {hovered === tag.hashtag && (
+                          <div className="absolute z-10 top-full left-1/2 transform -translate-x-1/2 mt-1 bg-gray-800/90 border border-white/10 rounded px-2 py-1 shadow-md whitespace-nowrap">
+                            <div className="text-xs">{tag.count} posts</div>
                           </div>
-                        </div>
-                      );
-                    })}
-                  </div>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              )}
-
-              {/* Tag Cloud View - same fixed height container, non-scrollable */}
-              {view === 'cloud' && (
-                <div className="h-full flex items-center justify-center">
-                  <div className="flex flex-wrap justify-center items-center gap-4 p-5 max-w-xl">
-                    {hashtagData.map((tag, index) => {
-                      // Calculate size based on count
-                      const maxCount = Math.max(...hashtagData.map(t => t.count));
-                      const minCount = Math.min(...hashtagData.map(t => t.count));
-                      const range = maxCount - minCount || 1;
-                      const sizeFactor = 0.8 + ((tag.count - minCount) / range);
-                      // Slightly larger font sizes for the expanded container
-                      const fontSize = `${Math.max(0.9, Math.min(2.0, sizeFactor * 1.3))}rem`;
-
-                      // Calculate color based on popularity rank
-                      let textColor;
-                      if (index === 0) textColor = 'text-yellow-400';
-                      else if (index === 1) textColor = 'text-blue-300';
-                      else if (index === 2) textColor = 'text-pink-400';
-                      else if (index < 6) textColor = 'text-purple-300';
-                      else textColor = 'text-blue-200/70';
-
-                      const fontWeight = index < 3 ? 'font-bold' : 'font-medium';
-
-                      return (
-                        <div
-                          key={tag.hashtag}
-                          className={`relative transition-all duration-300 hover:scale-110 cursor-pointer ${textColor} ${fontWeight} px-2 hover:drop-shadow-glow`}
-                          style={{ fontSize }}
-                          onMouseEnter={() => setHovered(tag.hashtag)}
-                          onMouseLeave={() => setHovered(null)}
-                        >
-                          {tag.hashtag}
-
-                          {/* Popup on hover */}
-                          {hovered === tag.hashtag && (
-                            <div className="absolute z-10 top-full left-1/2 transform -translate-x-1/2 mt-1 bg-gray-800/90 border border-white/10 rounded px-2 py-1 shadow-md whitespace-nowrap">
-                              <div className="text-xs">{tag.count} posts</div>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
+              </div>
             </div>
           </div>
         </div>
@@ -237,4 +132,4 @@ const HashtagWordCloud = () => {
   );
 };
 
-export default HashtagWordCloud;
+export default HashtagCloud;
