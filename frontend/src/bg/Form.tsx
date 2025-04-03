@@ -111,7 +111,7 @@ const InstagramAnalysisForm: React.FC = () => {
       }
       
       // Navigate to dashboard with the result data
-      navigate('/dashboard', { 
+      navigate('/engagement-analysis', { 
         state: { 
           username,
           fullURL,
