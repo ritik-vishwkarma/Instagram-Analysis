@@ -56,15 +56,15 @@ export interface HashtagCount {
  * @returns The collection name to use for API calls
  */
 export function getCollectionName(): string {
-  // Try to get from localStorage first
-  const storedName = localStorage.getItem('currentCollectionName');
-  if (storedName) {
-    return storedName;
-  }
+  // // Try to get from localStorage first
+  // const storedName = localStorage.getItem('currentCollectionName');
+  // if (storedName) {
+  //   return storedName;
+  // }
 
-  // Fallback to a default collection if none is stored
-  return 'Nothing to worry about!';
-  // return "collection_2025_03_22t20_03_28_551z_9jllnv47v";
+  // // Fallback to a default collection if none is stored
+  // return 'Nothing to worry about!';
+  return "collection_2025_03_22t20_03_28_551z_9jllnv47v";
 }
 
 /**

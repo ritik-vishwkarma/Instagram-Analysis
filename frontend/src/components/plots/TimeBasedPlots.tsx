@@ -84,39 +84,6 @@ const TimeBasedInsights = () => {
     loadData();
   }, []);
 
-  // Find peak engagement periods for insights based on selected metric
-  const getBestDay = (): string => {
-    if (dayData.length === 0) return "";
-    const bestDay = dayData.reduce((max, day) =>
-      day[selectedMetric] > max[selectedMetric] ? day : max, dayData[0]);
-    return bestDay.fullDay;
-  };
-
-  const getPeakHours = (): string => {
-    if (hourData.length === 0) return "";
-
-    // Sort by selected metric (descending)
-    const sortedHours = [...hourData].sort((a, b) => b[selectedMetric] - a[selectedMetric]);
-    const topHours = sortedHours.slice(0, 3);
-
-    // Format the hours for display
-    return topHours.map(h => h.hour).join(', ');
-  };
-
-  // Get description text based on selected metric
-  const getMetricDescription = (): string => {
-    switch (selectedMetric) {
-      case 'likes':
-        return `${getBestDay()} receives the most likes`;
-      case 'comments':
-        return `${getBestDay()} generates the most comments`;
-      case 'ratio':
-        return `${getBestDay()} has the highest like-to-comment ratio`;
-      default:
-        return `${getBestDay()} has the highest total engagement`;
-    }
-  };
-
   return (
     <div className="p-6 text-white min-h-screen">
       <div className="flex justify-center mb-10">
@@ -239,9 +206,6 @@ const TimeBasedInsights = () => {
                     />
                   </BarChart>
                 </div>
-                <div className="mt-4 text-center text-sm text-gray-400">
-                  {getBestDay() ? getMetricDescription() : "Analyzing engagement patterns..."}
-                </div>
               </CardContent>
             </Card>
           </motion.div>
@@ -329,9 +293,6 @@ const TimeBasedInsights = () => {
                       fill="url(#engagementGradient)"
                     />
                   </LineChart>
-                </div>
-                <div className="mt-4 text-center text-sm text-gray-400">
-                  {getPeakHours() ? `Peak ${selectedMetric === 'ratio' ? 'like-to-comment ratio' : selectedMetric} hours: ${getPeakHours()}` : "Analyzing hourly engagement patterns..."}
                 </div>
               </CardContent>
             </Card>

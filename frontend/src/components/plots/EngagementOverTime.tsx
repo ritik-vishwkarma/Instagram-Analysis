@@ -43,7 +43,7 @@ const LikesCommentOverTime = () => {
 
     return (
         <div className="p-6 text-white min-h-screen">
-            <div className="flex justify-center mb-10">
+            <div className="flex justify-center mb-2">
                 <div className="relative inline-block">
                     <h1 className="text-3xl font-bold text-center text-white relative z-10 px-10 py-3">
                         Instagram Engagement Analysis
@@ -79,9 +79,9 @@ const LikesCommentOverTime = () => {
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
-                    className="mb-8"
+                    className="mb-2"
                 >
-                    <Card>
+                    <Card className="border-0 bg-transparent shadow-none">
                         <CardContent className="pt-6">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="bg-gray-950 p-4 rounded-lg text-center">
@@ -118,7 +118,7 @@ const LikesCommentOverTime = () => {
                         transition={{ duration: 0.5 }}
                         className="flex flex-col h-full"
                     >
-                        <Card className="bg-gray-950 border-gray-700 h-full">
+                        <Card className="bg-gray-950 border-gray-800 h-full">
                             <CardContent className="pt-6 flex flex-col h-full">
                                 <h2 className="text-xl font-semibold mb-4 text-white">Likes & Comments Over Time</h2>
                                 {timeData.length > 0 ? (
@@ -129,7 +129,7 @@ const LikesCommentOverTime = () => {
                                             data={timeData}
                                             margin={{
                                                 top: 20,
-                                                right: 30, // Increased right margin to accommodate the secondary axis
+                                                right: 30,
                                                 left: 20,
                                                 bottom: 20,
                                             }}
@@ -203,9 +203,6 @@ const LikesCommentOverTime = () => {
                                         No time-based data available
                                     </div>
                                 )}
-                                <div className="mt-4 text-center text-sm text-gray-400">
-                                    Engagement metrics tracked over time
-                                </div>
                             </CardContent>
                         </Card>
                     </motion.div>
@@ -228,7 +225,7 @@ const LikesCommentOverTime = () => {
                                             data={data}
                                             margin={{
                                                 top: 20,
-                                                right: 30, // Increased right margin to accommodate the secondary axis
+                                                right: 30,
                                                 left: 20,
                                                 bottom: 20,
                                             }}
@@ -296,9 +293,6 @@ const LikesCommentOverTime = () => {
                                         No post type data available
                                     </div>
                                 )}
-                                <div className="mt-4 text-center text-sm text-gray-400">
-                                    Comparison of engagement metrics across different post types
-                                </div>
                             </CardContent>
                         </Card>
                     </motion.div>

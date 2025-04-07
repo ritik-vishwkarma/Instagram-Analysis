@@ -232,7 +232,7 @@ const TopPerformingPosts: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="w-full relative mt-8"
+                className="w-full relative mt-0"
             >
                 <div className="bg-gray-950 rounded-lg shadow-md p-4 border border-gray-800 w-full">
                     {/* Compact header with title and back button */}
