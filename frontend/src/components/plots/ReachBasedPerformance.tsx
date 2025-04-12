@@ -167,7 +167,7 @@ const TopPerformingPosts: React.FC = () => {
             <div className="bg-red-900/40 text-red-200 p-4 rounded-md mb-4 border border-red-800/50">
                 <p className="font-medium">Error</p>
                 <p className="text-sm">{error}</p>
-                <div className="flex justify-between items-center mt-3">
+                {/* <div className="flex justify-between items-center mt-3">
                     <button
                         onClick={() => setShowContent(false)}
                         className="px-3 py-1 rounded text-sm bg-gray-700 hover:bg-gray-600 text-white transition-colors"
@@ -180,7 +180,7 @@ const TopPerformingPosts: React.FC = () => {
                     >
                         Try Again
                     </button>
-                </div>
+                </div> */}
             </div>
         );
     }
@@ -208,12 +208,12 @@ const TopPerformingPosts: React.FC = () => {
                 <p className="font-medium">No Top Posts Found</p>
                 <p className="text-sm">Your collection may be empty or the performance models may need more data.</p>
                 <div className="flex justify-between items-center mt-3">
-                    <button
+                    {/* <button
                         onClick={() => setShowContent(false)}
                         className="px-3 py-1 rounded text-sm bg-gray-700 hover:bg-gray-600 text-white transition-colors"
                     >
                         Back to Button
-                    </button>
+                    </button> */}
                     <button
                         onClick={fetchTopPosts}
                         className="px-3 py-1 rounded text-sm bg-blue-700 hover:bg-blue-600 text-white transition-colors"
@@ -242,7 +242,7 @@ const TopPerformingPosts: React.FC = () => {
                             <p className="text-xs text-gray-400">Posts with highest engagement</p>
                         </div>
 
-                        <div className="flex gap-2">
+                        {/* <div className="flex gap-2">
                             <button
                                 onClick={() => setShowContent(false)}
                                 className="px-3 py-1 rounded text-white text-sm font-medium bg-gray-700 hover:bg-gray-600"
@@ -255,7 +255,7 @@ const TopPerformingPosts: React.FC = () => {
                             >
                                 Refresh
                             </button>
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Compact posts list */}

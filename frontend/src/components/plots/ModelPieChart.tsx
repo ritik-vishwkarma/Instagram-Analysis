@@ -272,12 +272,12 @@ const ModelPieChart: React.FC = () => {
                                     <p className="text-sm text-gray-400">AI-powered engagement predictions</p>
                                 </div>
 
-                                <button
+                                {/* <button
                                     onClick={fetchRecommendations}
                                     className="px-4 py-2 rounded-md text-white font-medium transition-all bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
                                 >
                                     Refresh
-                                </button>
+                                </button> */}
                             </div>
 
                             {/* Error message */}

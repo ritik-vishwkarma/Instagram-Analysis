@@ -317,6 +317,7 @@ def process_instagram_data(data: pd.DataFrame):
     
     datafinal = data[required_columns].copy()
     datafinal["timestamp"] = pd.to_datetime(datafinal["timestamp"])
+    print(f"timestamps = {datafinal['timestamp']}")
     datafinal["Hour"] = datafinal["timestamp"].dt.hour
     datafinal["Engagement"] = datafinal["likesCount"] + datafinal["commentsCount"]
     
@@ -327,17 +328,96 @@ def process_instagram_data(data: pd.DataFrame):
     datafinal["Cluster"] = kmeans.fit_predict(X_scaled)
     
     peak_times = []
+    seen_time_ranges = set()
+
     for cluster in sorted(datafinal["Cluster"].unique()):
         peak_hours = datafinal[datafinal["Cluster"] == cluster]["Hour"].tolist()
         mode_hour = Counter(peak_hours).most_common(1)[0][0]
         p = [max(0, mode_hour - 1), mode_hour]
-        peak_times.append({"cluster": cluster, "peak_hours": f"{p[0]}-{p[1]} Hrs"})
-    
+        time_range = f"{p[0]}-{p[1]} Hrs"
+        
+        # Only add if we haven't seen this time range before
+        if time_range not in seen_time_ranges:
+            peak_times.append({"cluster": cluster, "peak_hours": time_range})
+            seen_time_ranges.add(time_range)
+
+    print(peak_times)
+    # Take the first 3 entries after sorting by cluster
     peak_times = sorted(peak_times, key=lambda x: x['cluster'])[:3]
-    
+    print(peak_times)
+    to_csv_and_graph(datafinal, peak_times)
+
     return peak_times, datafinal
 
-
+def to_csv_and_graph(data, peak_times):
+    """Convert data to CSV and generate graphs showing original data and clusters"""
+    # Save data to CSV
+    data.to_csv("data.csv", index=False)
+    print("Data saved to data.csv")
+    
+    # Generate visualization of original data and clusters
+    import matplotlib.pyplot as plt
+    import matplotlib.dates as mdates
+    
+    # Plot 1: Likes Over Time (original data)
+    plt.figure(figsize=(12, 5))
+    plt.plot(data['timestamp'], data['likesCount'], marker='o', linestyle='-')
+    plt.title('Likes Over Time')
+    plt.xlabel('Timestamp')
+    plt.ylabel('Likes Count')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig("likes_over_time.png")
+    print("Graph saved as likes_over_time.png")
+    
+    # Plot 2: Scatter plot showing Hour vs. Engagement colored by cluster
+    plt.figure(figsize=(12, 6))
+    
+    # Create a lookup dictionary for peak hours by cluster
+    peak_hours_lookup = {item['cluster']: item['peak_hours'] for item in peak_times}
+    
+    # Plot each cluster with a different color
+    for cluster in sorted(data["Cluster"].unique()):
+        cluster_data = data[data["Cluster"] == cluster]
+        plt.scatter(
+            cluster_data["Hour"], 
+            cluster_data["Engagement"],
+            label=f'Cluster {cluster} (Peak: {peak_hours_lookup.get(cluster, "N/A")})',
+            alpha=0.7,
+            s=80
+        )
+    
+    plt.title('Instagram Posts Clustering: Hour vs. Engagement')
+    plt.xlabel('Hour of Day')
+    plt.ylabel('Engagement (Likes + Comments)')
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.legend()
+    plt.tight_layout()
+    plt.savefig("clustering_results.png")
+    print("Clustering visualization saved as clustering_results.png")
+    
+    # Plot 3: Time series with points colored by cluster
+    plt.figure(figsize=(14, 7))
+    
+    for cluster in sorted(data["Cluster"].unique()):
+        cluster_data = data[data["Cluster"] == cluster]
+        plt.scatter(
+            cluster_data["timestamp"], 
+            cluster_data["Engagement"],
+            label=f'Cluster {cluster}',
+            alpha=0.7,
+            s=80
+        )
+    
+    plt.title('Instagram Posts Over Time (Colored by Cluster)')
+    plt.xlabel('Timestamp')
+    plt.ylabel('Engagement (Likes + Comments)')
+    plt.gcf().autofmt_xdate()
+    plt.legend()
+    plt.grid(True, linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    plt.savefig("time_series_clusters.png")
+    print("Time series cluster visualization saved as time_series_clusters.png")
 # ----- API ENDPOINTS ----
 
 @app.get("/health")

@@ -194,13 +194,13 @@ const PostingTimeAnalyzer: React.FC<PostingTimeAnalyzerProps> = () => {
                         <h3 className="text-white text-xl font-medium m-0">Optimal Posting Times</h3>
                     </div>
 
-                    <button
+                    {/* <button
                         onClick={analyzePostingTime}
                         disabled={loading}
                         className="px-4 py-2 rounded-lg text-white text-sm bg-blue-700/50 hover:bg-blue-700/70 transition-colors"
                     >
                         {loading ? 'Refreshing...' : 'Refresh Analysis'}
-                    </button>
+                    </button> */}
                 </div>
 
                 {responseMessage && (
@@ -274,14 +274,14 @@ const PostingTimeAnalyzer: React.FC<PostingTimeAnalyzerProps> = () => {
                             Consider scheduling your posts around these times for optimal reach and engagement.
                         </div>
 
-                        <div className="flex justify-center mt-6">
+                        {/* <div className="flex justify-center mt-6">
                             <button
                                 onClick={() => setShowResults(false)}
                                 className="px-4 py-2 rounded-lg text-gray-400 text-sm hover:text-gray-300 border border-gray-800 hover:border-gray-700 transition-colors"
                             >
                                 Back to Analysis
                             </button>
-                        </div>
+                        </div> */}
                     </motion.div>
                 )}
             </motion.div>
