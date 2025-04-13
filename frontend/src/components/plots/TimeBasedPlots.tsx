@@ -36,10 +36,10 @@ const TimeBasedInsights = () => {
   // Helper function to get color for each metric
   const getColorForMetric = (metric: MetricType): string => {
     switch (metric) {
-      case 'likes': return '#8884d8'; // Purple
-      case 'comments': return '#82ca9d'; // Green
-      case 'ratio': return '#ffb00f'; // Yellow/Gold
-      default: return '#8B8000'; // Purple for total (default)
+      case 'likes': return '#8884d8';
+      case 'comments': return '#82ca9d';
+      case 'ratio': return '#ffb00f';
+      default: return '#8B8000';
     }
   };
 
@@ -48,8 +48,8 @@ const TimeBasedInsights = () => {
     switch (metric) {
       case 'likes': return 'Likes';
       case 'comments': return 'Comments';
-      case 'ratio': return 'Like/Comment Ratio';
-      default: return 'Total Engagement';
+      case 'ratio': return 'Likes/Comments';
+      default: return 'Engagement';
     }
   };
 
@@ -66,16 +66,12 @@ const TimeBasedInsights = () => {
       try {
         setLoading(true);
         setError(null);
-
-        // Use the centralized data fetching function
         const { dayData: dayEngagementData, hourData: hourEngagementData } = await fetchTimeEngagementData();
-
-        // Update state
         setDayData(dayEngagementData);
         setHourData(hourEngagementData);
       } catch (err) {
         console.error("Error loading time-based data:", err);
-        setError("Failed to load engagement data. Please try again later.");
+        setError("Failed to load engagement data.");
       } finally {
         setLoading(false);
       }
@@ -84,32 +80,62 @@ const TimeBasedInsights = () => {
     loadData();
   }, []);
 
+  // Find peak engagement periods for insights based on selected metric
+  const getBestDay = (): string => {
+    if (dayData.length === 0) return "";
+    const bestDay = dayData.reduce((max, day) =>
+      day[selectedMetric] > max[selectedMetric] ? day : max, dayData[0]);
+    return bestDay.fullDay;
+  };
+
+  const getPeakHours = (): string => {
+    if (hourData.length === 0) return "";
+    const sortedHours = [...hourData].sort((a, b) => b[selectedMetric] - a[selectedMetric]);
+    const topHours = sortedHours.slice(0, 3);
+    return topHours.map(h => h.hour).join(', ');
+  };
+
+  // Get description text based on selected metric
+  const getMetricDescription = (): string => {
+    switch (selectedMetric) {
+      case 'likes':
+        return `${getBestDay()} sees most likes`;
+      case 'comments':
+        return `${getBestDay()} gets most comments`;
+      case 'ratio':
+        return `${getBestDay()} has highest Likes/Comments ratio`;
+      default:
+        return `${getBestDay()} has highest engagement`;
+    }
+  };
+
   return (
-    <div className="p-6 text-white min-h-screen">
-      <div className="flex justify-center mb-10">
+    <div className="p-2 text-white h-full">
+      {/* Even more compact title */}
+      <div className="flex justify-center mb-1">
         <div className="relative inline-block">
-          <h1 className="text-3xl font-bold text-center text-white relative z-10 px-10 py-3">
-            Optimal Posting Time Analysis
+          <h1 className="text-base font-bold text-center text-white relative z-10 px-3 py-0.5">
+            Time Based Analysis
           </h1>
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/30 via-pink-500/30 to-blue-600/30 rounded-lg backdrop-blur-sm border border-white/10 shadow-xl transform -rotate-1 z-0"></div>
-          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 via-purple-500/20 to-pink-500/20 rounded-lg backdrop-blur-sm border border-white/10 shadow-lg transform rotate-1 z-0"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/30 via-pink-500/30 to-blue-600/30 rounded-md backdrop-blur-sm border border-white/10 shadow-md transform -rotate-1 z-0"></div>
+          <div className="absolute -inset-1 bg-gradient-to-r from-blue-600/20 via-purple-500/20 to-pink-500/20 rounded-md backdrop-blur-sm border border-white/10 shadow-md transform rotate-1 z-0"></div>
         </div>
       </div>
 
-      {/* Loading state */}
+      {/* Ultra compact loading state */}
       {loading && (
-        <div className="text-center py-4">
-          <div className="inline-block animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-2"></div>
-          <span className="text-white">Loading engagement data...</span>
+        <div className="text-center py-0.5">
+          <div className="inline-block animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full mr-1"></div>
+          <span className="text-white text-xs">Loading data...</span>
         </div>
       )}
 
-      {/* Error state */}
+      {/* Ultra compact error state */}
       {error && (
-        <div className="bg-red-900/50 p-4 rounded-lg mb-6 text-center">
+        <div className="bg-red-900/50 p-1 rounded mb-1 text-center text-xs">
           <p className="text-red-200">{error}</p>
           <button
-            className="mt-2 px-4 py-2 bg-red-700 hover:bg-red-600 rounded-lg text-white text-sm"
+            className="mt-0.5 px-2 py-0.5 bg-red-700 hover:bg-red-600 rounded text-white text-xs"
             onClick={() => window.location.reload()}
           >
             Try Again
@@ -117,77 +143,62 @@ const TimeBasedInsights = () => {
         </div>
       )}
 
-      {/* Metric Toggle Buttons */}
+      {/* Ultra compact metric toggle buttons */}
       {!loading && !error && (
-        <div className="flex justify-center mb-6 gap-2">
-          <button
-            className={`px-3 py-1 rounded text-sm ${selectedMetric === 'total' ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 transition-colors`}
-            onClick={() => setSelectedMetric('total')}
-          >
-            Total Engagement
-          </button>
-          <button
-            className={`px-3 py-1 rounded text-sm ${selectedMetric === 'likes' ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 transition-colors`}
-            onClick={() => setSelectedMetric('likes')}
-          >
-            Likes
-          </button>
-          <button
-            className={`px-3 py-1 rounded text-sm ${selectedMetric === 'comments' ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 transition-colors`}
-            onClick={() => setSelectedMetric('comments')}
-          >
-            Comments
-          </button>
-          <button
-            className={`px-3 py-1 rounded text-sm ${selectedMetric === 'ratio' ? 'bg-blue-600' : 'bg-gray-800'} hover:bg-blue-500 transition-colors`}
-            onClick={() => setSelectedMetric('ratio')}
-          >
-            Like/Comment Ratio
-          </button>
+        <div className="flex justify-center mb-1 gap-2">
+          {(['total', 'likes', 'comments', 'ratio'] as MetricType[]).map(metric => (
+            <button
+              key={metric}
+              className={`px-2 py-0.5 rounded text-xs ${selectedMetric === metric ? 'bg-blue-600' : 'bg-gray-700'} hover:bg-blue-500 transition-colors`}
+              onClick={() => setSelectedMetric(metric)}
+            >
+              {getNameForMetric(metric)}
+            </button>
+          ))}
         </div>
       )}
 
-      {/* Grid with two columns for horizontal layout */}
+      {/* Grid with two columns for horizontal layout - minimized gap */}
       {!loading && !error && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
           {/* Best Day to Post - Left Side */}
           <motion.div
-            initial={{ opacity: 0, x: -20 }}
+            initial={{ opacity: 0, x: -5 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.2 }}
             className="flex flex-col h-full"
           >
-            <Card className="bg-gray-950 border-gray-700 h-full">
-              <CardContent className="pt-6 flex flex-col h-full">
-                <h2 className="text-xl font-semibold mb-4 text-white">Best Day to Post</h2>
+            <Card className="bg-gray-950 border-gray-800 h-full">
+              <CardContent className="p-1 flex flex-col h-full">
+                <div className="text-center">
+                  <h2 className="text-xs font-semibold text-white">Best Day to Post</h2>
+                </div>
                 <div className="flex justify-center flex-grow">
                   <BarChart
-                    width={500}
-                    height={350}
+                    width={330}
+                    height={270}
                     data={dayData}
-                    margin={{
-                      top: 20,
-                      right: 20,
-                      left: 20,
-                      bottom: 20,
-                    }}
+                    margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#444" />
-                    <XAxis dataKey="day" stroke="#fff" />
+                    <XAxis dataKey="day" stroke="#fff" tick={{ fontSize: 11 }} />
                     <YAxis
                       stroke="#fff"
                       tickFormatter={selectedMetric === 'ratio' ? formatRatio : formatNumber}
                       domain={selectedMetric === 'ratio' ? [0, 'auto'] : undefined}
+                      tick={{ fontSize: 11 }}
+                      width={30}
                     />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: '#1f2937',
                         border: 'none',
                         borderRadius: '5px',
-                        color: '#fff'
+                        color: '#fff',
+                        padding: '5px',
+                        fontSize: '12px'
                       }}
                       labelFormatter={(label) => {
-                        // Find the full day name from the data array
                         const dayItem = dayData.find(item => item.day === label);
                         return dayItem ? dayItem.fullDay : label;
                       }}
@@ -198,7 +209,6 @@ const TimeBasedInsights = () => {
                         getNameForMetric(selectedMetric as MetricType)
                       ]}
                     />
-                    <Legend />
                     <Bar
                       dataKey={selectedMetric}
                       fill={getColorForMetric(selectedMetric as MetricType)}
@@ -212,43 +222,45 @@ const TimeBasedInsights = () => {
 
           {/* Engagement by Hour - Right Side */}
           <motion.div
-            initial={{ opacity: 0, x: 20 }}
+            initial={{ opacity: 0, x: 5 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
+            transition={{ duration: 0.2, delay: 0.05 }}
             className="flex flex-col h-full"
           >
-            <Card className="bg-gray-950 border-gray-700 h-full">
-              <CardContent className="pt-6 flex flex-col h-full">
-                <h2 className="text-xl font-semibold mb-4 text-white">Engagement by Hour</h2>
+            <Card className="bg-gray-950 border-gray-800 h-full">
+              <CardContent className="p-1 flex flex-col h-full">
+                <div className="text-center">
+                  <h2 className="text-xs font-semibold text-white">Engagement by Hour</h2>
+                </div>
                 <div className="flex justify-center flex-grow">
                   <LineChart
-                    width={500}
-                    height={350}
+                    width={330}
+                    height={270}
                     data={hourData}
-                    margin={{
-                      top: 20,
-                      right: 20,
-                      left: 20,
-                      bottom: 20,
-                    }}
+                    margin={{ top: 5, right: 10, left: -10, bottom: 5 }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#444" />
                     <XAxis
                       dataKey="hour"
                       stroke="#fff"
-                      interval={3} // Show fewer x-axis labels to avoid crowding
+                      interval={3}
+                      tick={{ fontSize: 11 }}
                     />
                     <YAxis
                       stroke="#fff"
                       tickFormatter={selectedMetric === 'ratio' ? formatRatio : formatNumber}
                       domain={selectedMetric === 'ratio' ? [0, 'auto'] : undefined}
+                      tick={{ fontSize: 11 }}
+                      width={30}
                     />
                     <Tooltip
                       contentStyle={{
                         backgroundColor: '#1f2937',
                         border: 'none',
                         borderRadius: '5px',
-                        color: '#fff'
+                        color: '#fff',
+                        padding: '5px',
+                        fontSize: '12px'
                       }}
                       labelFormatter={(label) => `Time: ${label}`}
                       formatter={(value) => [
@@ -258,18 +270,15 @@ const TimeBasedInsights = () => {
                         getNameForMetric(selectedMetric as MetricType)
                       ]}
                     />
-                    <Legend />
                     <Line
                       type="monotone"
                       dataKey={selectedMetric}
                       stroke={getColorForMetric(selectedMetric as MetricType)}
-                      strokeWidth={2}
-                      activeDot={{ r: 8 }}
-                      dot={{ r: 4 }}
+                      strokeWidth={1.5}
+                      activeDot={{ r: 4 }}
+                      dot={{ r: 2.5 }}
                       name={getNameForMetric(selectedMetric as MetricType)}
                     />
-
-                    {/* Add a gradient under the line */}
                     <defs>
                       <linearGradient id="engagementGradient" x1="0" y1="0" x2="0" y2="1">
                         <stop
@@ -284,7 +293,6 @@ const TimeBasedInsights = () => {
                         />
                       </linearGradient>
                     </defs>
-
                     <Area
                       type="monotone"
                       dataKey={selectedMetric}

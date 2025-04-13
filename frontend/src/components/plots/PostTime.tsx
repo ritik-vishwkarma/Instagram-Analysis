@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { getCollectionName } from '../../db/index.ts';
 import { ClockCircleOutlined } from '@ant-design/icons';
@@ -20,20 +20,25 @@ interface PostingTimeAnalyzerProps {
 }
 
 const PostingTimeAnalyzer: React.FC<PostingTimeAnalyzerProps> = () => {
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true); // Start with loading true
     const [error, setError] = useState<string | null>(null);
     const [results, setResults] = useState<PeakTime[] | null>(null);
     const [responseMessage, setResponseMessage] = useState<string | null>(null);
     const [showResults, setShowResults] = useState<boolean>(false);
     const [hoveredCluster, setHoveredCluster] = useState<number | null>(null);
 
-    // Function to get peak posting times - follows fetchRecommendations pattern
+    // Fetch data automatically when component mounts
+    useEffect(() => {
+        analyzePostingTime();
+    }, []);
+
+    // Function to get peak posting times
     const analyzePostingTime = async () => {
         try {
             setLoading(true);
             setError(null);
 
-            // Get collection name directly from DB - exactly like fetchRecommendations
+            // Get collection name directly from DB
             const collectionName = getCollectionName();
 
             // Make sure we have a valid collection name
@@ -65,7 +70,7 @@ const PostingTimeAnalyzer: React.FC<PostingTimeAnalyzerProps> = () => {
                 setResults(response.data.best_peak_posting_times);
                 setResponseMessage(response.data.message);
 
-                // Small delay to ensure smooth transition - exactly like fetchRecommendations
+                // Small delay to ensure smooth transition
                 setTimeout(() => {
                     setLoading(false);
                     setShowResults(true);
@@ -77,7 +82,7 @@ const PostingTimeAnalyzer: React.FC<PostingTimeAnalyzerProps> = () => {
         } catch (err) {
             console.error('Failed to analyze posting times:', err);
 
-            // Enhanced error handling to show more useful messages - exactly like fetchRecommendations
+            // Enhanced error handling to show more useful messages
             if (axios.isAxiosError(err)) {
                 const statusCode = err.response?.status;
                 const responseData = err.response?.data;
@@ -107,68 +112,36 @@ const PostingTimeAnalyzer: React.FC<PostingTimeAnalyzerProps> = () => {
         return isHovered ? hoverColors[cluster % hoverColors.length] : colors[cluster % colors.length];
     };
 
-    // If we don't have results yet or are in the initial state
-    if (!showResults) {
+    // Loading state
+    if (loading) {
         return (
-            <div className="flex justify-center">
-                <div className="w-full p-6 flex flex-col items-center">
-                    <button
-                        onClick={analyzePostingTime}
-                        disabled={loading}
-                        className={`px-6 py-3 rounded-lg text-white font-medium text-lg transition-all ${loading
-                                ? 'bg-blue-700 cursor-wait'
-                                : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 shadow-lg hover:shadow-xl'
-                            }`}
-                    >
-                        <div className="flex items-center">
-                            {loading ? (
-                                <>
-                                    <svg className="animate-spin w-5 h-5 mr-2" viewBox="0 0 24 24">
-                                        <circle
-                                            className="opacity-25"
-                                            cx="12"
-                                            cy="12"
-                                            r="10"
-                                            stroke="currentColor"
-                                            strokeWidth="4"
-                                        ></circle>
-                                        <path
-                                            className="opacity-75"
-                                            fill="currentColor"
-                                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                                        ></path>
-                                    </svg>
-                                    Analyzing Posting Times...
-                                </>
-                            ) : (
-                                <>
-                                    <ClockCircleOutlined style={{ marginRight: 8 }} />
-                                    Get Optimal Posting Times
-                                </>
-                            )}
-                        </div>
-                    </button>
-
-                    {error && (
-                        <div className="bg-red-900/30 border border-red-800 rounded-lg p-4 mt-6 max-w-lg w-full">
-                            <div className="text-red-400 font-medium mb-1">Analysis Error</div>
-                            <div className="text-gray-300 mb-2">{error}</div>
-                            <button
-                                onClick={() => setError(null)}
-                                className="text-red-400 hover:text-red-300 text-sm font-medium"
-                            >
-                                Dismiss
-                            </button>
-                        </div>
-                    )}
-
-                    {loading && (
-                        <div className="mt-6 text-center">
-                            <div className="text-gray-300 mb-1">Analyzing your Instagram data</div>
-                            <div className="text-gray-500 text-sm">This may take a few moments</div>
-                        </div>
-                    )}
+            <div className="flex justify-center items-center p-8">
+                <div className="flex items-center">
+                    <svg className="animate-spin w-5 h-5 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span className="text-lg text-gray-200">Analyzing optimal posting times...</span>
                 </div>
+            </div>
+        );
+    }
+
+    // Error state
+    if (error) {
+        return (
+            <div className="bg-red-900/40 text-red-200 p-4 rounded-md mb-4 border border-red-800/50">
+                <p className="font-medium">Error</p>
+                <p className="text-sm">{error}</p>
+                <button
+                    onClick={analyzePostingTime}
+                    className="px-3 py-1.5 mt-3 rounded text-sm bg-red-700 hover:bg-red-600 text-white transition-colors flex items-center"
+                >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    Try Again
+                </button>
             </div>
         );
     }
@@ -180,7 +153,7 @@ const PostingTimeAnalyzer: React.FC<PostingTimeAnalyzerProps> = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="w-full bg-gray-950 rounded-lg border border-gray-800 p-6 mb-6 shadow-lg mt-8"
+                className="w-full bg-gray-950 rounded-lg border border-gray-800 p-6 mb-6 shadow-lg"
             >
                 <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center">
@@ -192,14 +165,6 @@ const PostingTimeAnalyzer: React.FC<PostingTimeAnalyzerProps> = () => {
                         </div>
                         <h3 className="text-white text-xl font-medium m-0">Optimal Posting Times</h3>
                     </div>
-
-                    <button
-                        onClick={analyzePostingTime}
-                        disabled={loading}
-                        className="px-4 py-2 rounded-lg text-white text-sm bg-blue-700/50 hover:bg-blue-700/70 transition-colors"
-                    >
-                        {loading ? 'Refreshing...' : 'Refresh Analysis'}
-                    </button>
                 </div>
 
                 {responseMessage && (
@@ -211,19 +176,6 @@ const PostingTimeAnalyzer: React.FC<PostingTimeAnalyzerProps> = () => {
                     >
                         {responseMessage}
                     </motion.div>
-                )}
-
-                {error && (
-                    <div className="bg-red-900/30 border border-red-800 rounded-lg p-4 mb-6">
-                        <div className="text-red-400 font-medium mb-1">Analysis Error</div>
-                        <div className="text-gray-300 mb-2">{error}</div>
-                        <button
-                            onClick={analyzePostingTime}
-                            className="text-red-400 hover:text-red-300 text-sm font-medium"
-                        >
-                            Try Again
-                        </button>
-                    </div>
                 )}
 
                 {results && results.length > 0 && (
@@ -271,15 +223,6 @@ const PostingTimeAnalyzer: React.FC<PostingTimeAnalyzerProps> = () => {
                         <div className="text-gray-500 text-sm italic p-3 border-t border-gray-800 mt-3">
                             These times are based on when your audience has shown the highest engagement with your content.
                             Consider scheduling your posts around these times for optimal reach and engagement.
-                        </div>
-
-                        <div className="flex justify-center mt-6">
-                            <button
-                                onClick={() => setShowResults(false)}
-                                className="px-4 py-2 rounded-lg text-gray-400 text-sm hover:text-gray-300 border border-gray-800 hover:border-gray-700 transition-colors"
-                            >
-                                Back to Analysis
-                            </button>
                         </div>
                     </motion.div>
                 )}

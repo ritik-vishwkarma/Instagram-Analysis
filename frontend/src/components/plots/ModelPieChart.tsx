@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { getCollectionName } from '../../db/index.ts';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
@@ -13,7 +13,7 @@ interface RecommendationData {
 
 const ModelPieChart: React.FC = () => {
     const [recommendationData, setRecommendationData] = useState<RecommendationData[]>([]);
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [showChart, setShowChart] = useState<boolean>(false);
     const [hoveredSegment, setHoveredSegment] = useState<string | null>(null);
@@ -78,6 +78,11 @@ const ModelPieChart: React.FC = () => {
             setLoading(false);
         }
     };
+
+    // Call fetchRecommendations when the component mounts
+    useEffect(() => {
+        fetchRecommendations();
+    }, []);
 
     // Function to parse the recommendation data from the API response
     const parseRecommendationData = (data: any): RecommendationData[] => {
@@ -184,8 +189,6 @@ const ModelPieChart: React.FC = () => {
             const colorIndex = recommendationData.findIndex(item => item.type === data.type);
             const bgColor = HOVER_COLORS[colorIndex % HOVER_COLORS.length];
 
-            // Get the color with proper contrast for text
-
             return (
                 <div className="backdrop-blur-xl bg-gray-800/70 p-5 rounded-lg shadow-2xl border border-white/20 transform transition-all duration-200">
                     <div className="relative z-10">
@@ -207,7 +210,6 @@ const ModelPieChart: React.FC = () => {
                                         <p className="font-medium text-white">{formatLargeNumber(data.expected_average_comments)}</p>
                                     </div>
                                 </div>
-                                {/* Removed the "Click to see detailed recommendation" text */}
                             </div>
                         </div>
                     </div>
@@ -219,38 +221,36 @@ const ModelPieChart: React.FC = () => {
 
     return (
         <div className="flex justify-center">
-            {/* Initial button or loading state */}
-            {!showChart ? (
-                <div className="flex justify-center">
+            {/* Loading indicator */}
+            {loading && (
+                <div className="flex items-center justify-center p-8">
+                    <svg className="animate-spin w-10 h-10 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    <span className="text-lg font-medium text-gray-200">Analyzing content for recommendations...</span>
+                </div>
+            )}
+
+            {/* Error message */}
+            {!loading && error && (
+                <div className="bg-red-900/40 text-red-200 p-6 rounded-md w-full max-w-2xl mx-auto border border-red-800/50 shadow-lg">
+                    <h3 className="text-xl font-semibold mb-2">Unable to Load Recommendations</h3>
+                    <p className="mb-4">{error}</p>
                     <button
                         onClick={fetchRecommendations}
-                        disabled={loading}
-                        className={`px-6 py-3 rounded-lg text-white font-medium text-lg transition-all ${loading
-                            ? 'bg-blue-700 cursor-wait'
-                            : 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 shadow-lg hover:shadow-xl'
-                            }`}
+                        className="px-4 py-2 rounded bg-red-700 hover:bg-red-600 text-white transition-colors flex items-center"
                     >
-                        <div className="flex items-center">
-                            {loading ? (
-                                <>
-                                    <svg className="animate-spin w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                    </svg>
-                                    Analyzing...
-                                </>
-                            ) : (
-                                <>
-                                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                                    </svg>
-                                    Get Predictions
-                                </>
-                            )}
-                        </div>
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        Try Again
                     </button>
                 </div>
-            ) : (
+            )}
+
+            {/* Chart display */}
+            {!loading && !error && showChart && (
                 // Animated chart container that fades in
                 <AnimatePresence>
                     <motion.div
@@ -268,31 +268,10 @@ const ModelPieChart: React.FC = () => {
                             {/* Header with title */}
                             <div className="flex justify-between items-center mb-6">
                                 <div>
-                                    <h2 className="text-xl font-semibold text-white">Post Type Predictions</h2>
+                                    <h2 className="text-xl font-semibold text-white">Post Type Recommendations</h2>
                                     <p className="text-sm text-gray-400">AI-powered engagement predictions</p>
                                 </div>
-
-                                <button
-                                    onClick={fetchRecommendations}
-                                    className="px-4 py-2 rounded-md text-white font-medium transition-all bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
-                                >
-                                    Refresh
-                                </button>
                             </div>
-
-                            {/* Error message */}
-                            {error && (
-                                <div className="bg-red-900/40 text-red-200 p-4 rounded-md mb-4 border border-red-800/50">
-                                    <p className="font-medium">Error</p>
-                                    <p className="text-sm">{error}</p>
-                                    <button
-                                        onClick={fetchRecommendations}
-                                        className="mt-3 px-3 py-1 rounded text-sm bg-red-700 hover:bg-red-600 text-white transition-colors"
-                                    >
-                                        Try Again
-                                    </button>
-                                </div>
-                            )}
 
                             {/* Results area */}
                             {recommendationData.length > 0 && (
