@@ -5,7 +5,7 @@ import { runActor } from "../controllers/apify.controller.js";
 const router = Router();
 
 router.route("/run-actor").post(runActor);
-router.route("/llm").post(llmRunner);
+// router.route("/llm").post(llmRunner);
 
 export default router;
 
