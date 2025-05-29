@@ -496,4 +496,4 @@ async def analyze(request: RequestBody):
 # Run the API
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("s_api:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("model_endpoints:app", host="0.0.0.0", port=8000, reload=True)
