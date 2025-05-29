@@ -422,4 +422,4 @@ async def top5_posts(request: RequestBody):
 # Run the API
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("s_api:app", host="0.0.0.0", port=8000, reload=True)
+    uvicorn.run("fastapi_two_models:app", host="0.0.0.0", port=8000, reload=True)
