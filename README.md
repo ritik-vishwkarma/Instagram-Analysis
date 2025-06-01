@@ -82,22 +82,18 @@ To run models
 
 ### Main Screenshot
 <p align="center">
-  <img src="images/image_1.png" alt="Main Screenshot" width="400"/>
+  <img src="images/image_1.png" alt="Main Screenshot" width="900"/>
 </p>
-
-### Additional Screenshots (3x2 Grid)
-<table align="center">
-  <tr>
-    <td align="center"><img src="images/image_2.png" alt="Screenshot 2" width="150"/></td>
-    <td align="center"><img src="images/image_3.png" alt="Screenshot 3" width="150"/></td>
-    <td align="center"><img src="images/image_4.png" alt="Screenshot 4" width="150"/></td>
-  </tr>
-  <tr>
-    <td align="center"><img src="images/image_5.png" alt="Screenshot 5" width="150"/></td>
-    <td align="center"><img src="images/image_6.png" alt="Screenshot 6" width="150"/></td>
-    <td align="center"><img src="images/image_7.png" alt="Screenshot 7" width="150"/></td>
-  </tr>
-</table>
+<p align="center">
+  <img src="images/image_2.png" alt="Screenshot 2" width="300"/>
+  <img src="images/image_3.png" alt="Screenshot 3" width="300"/>
+  <img src="images/image_4.png" alt="Screenshot 4" width="300"/>
+</p>
+<p align="center">
+  <img src="images/image_5.png" alt="Screenshot 5" width="300"/>
+  <img src="images/image_6.png" alt="Screenshot 6" width="300"/>
+  <img src="images/image_7.png" alt="Screenshot 7" width="300"/>
+</p>
 
 
 ## Tech Stack
