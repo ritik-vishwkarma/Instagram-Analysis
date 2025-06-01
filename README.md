@@ -70,12 +70,12 @@ To run models
 ## Screenshots
 
 ![App Screenshot](images/image_1.png)
-![App Screenshot](images/image_2.jpg)
-![App Screenshot](images/image_3.jpg)
-![App Screenshot](images/image_4.jpg)
-![App Screenshot](images/image_5.jpg)
-![App Screenshot](images/image_6.jpg)
-![App Screenshot](images/image_7.jpg)
+![App Screenshot](images/image_2.png)
+![App Screenshot](images/image_3.png)
+![App Screenshot](images/image_4.png)
+![App Screenshot](images/image_5.png)
+![App Screenshot](images/image_6.png)
+![App Screenshot](images/image_7.png)
 
 
 
