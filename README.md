@@ -78,25 +78,26 @@ To run models
 ![App Screenshot](images/image_7.png) -->
 
 <!-- 1st image displayed alone -->
+## Screenshots
+
+### Main Screenshot
 <p align="center">
-  <img src="images/image_1.png" alt="Image 1" width="400"/>
+  <img src="images/image_1.png" alt="Main Screenshot" width="400"/>
 </p>
 
-<!-- 2x3 grid for the next 6 images -->
-<table>
+### Additional Screenshots (3x2 Grid)
+<table align="center">
   <tr>
-    <td><img src="images/image_2.png" alt="Image 2" width="150"/></td>
-    <td><img src="images/image_3.png" alt="Image 3" width="150"/></td>
-    <td><img src="images/image_4.png" alt="Image 4" width="150"/></td>
+    <td align="center"><img src="images/image_2.png" alt="Screenshot 2" width="150"/></td>
+    <td align="center"><img src="images/image_3.png" alt="Screenshot 3" width="150"/></td>
+    <td align="center"><img src="images/image_4.png" alt="Screenshot 4" width="150"/></td>
   </tr>
   <tr>
-    <td><img src="images/image_5.png" alt="Image 5" width="150"/></td>
-    <td><img src="images/image_6.png" alt="Image 6" width="150"/></td>
-    <td><img src="images/image_7.png" alt="Image 7" width="150"/></td>
+    <td align="center"><img src="images/image_5.png" alt="Screenshot 5" width="150"/></td>
+    <td align="center"><img src="images/image_6.png" alt="Screenshot 6" width="150"/></td>
+    <td align="center"><img src="images/image_7.png" alt="Screenshot 7" width="150"/></td>
   </tr>
 </table>
-
-
 
 
 ## Tech Stack
